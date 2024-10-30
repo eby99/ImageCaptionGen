@@ -34,6 +34,8 @@ st.markdown("""
             background-color: white; /* White card background */
             max-width: 800px; /* Limit width */
             margin: auto; /* Center the card */
+            overflow-y: auto; /* Enable scrolling */
+            max-height: 80vh; /* Limit height */
         }
         h1 {
             color: red; /* Title color */
@@ -56,6 +58,8 @@ st.markdown("""
             border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s ease; /* Smooth transition */
+            display: block; /* Make button a block element */
+            margin: 20px auto; /* Center align button */
         }
         .button:hover {
             background-color: #e0245e; /* Button hover color */
@@ -70,53 +74,55 @@ st.markdown("""
 st.title("Image Caption Generator")
 st.write("")
 
-# Image upload
-uploaded_image = st.file_uploader("Choose an image file (JPG, JPEG, PNG)", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
+# Scrollable container for main content
+with st.container():
+    # Image upload
+    uploaded_image = st.file_uploader("Choose an image file (JPG, JPEG, PNG)", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
 
-# Define functions for preprocessing, feature extraction, and caption generation
-def preprocess_image(image):
-    img = Image.open(image).convert("RGB")
-    inputs = convnext_processor(images=img, return_tensors="pt").to(device)
-    return inputs
+    # Define functions for preprocessing, feature extraction, and caption generation
+    def preprocess_image(image):
+        img = Image.open(image).convert("RGB")
+        inputs = convnext_processor(images=img, return_tensors="pt").to(device)
+        return inputs
 
-def extract_features(image):
-    inputs = preprocess_image(image)
-    with torch.no_grad():
-        outputs = convnext_model(**inputs)
-        features = outputs.logits
-    return features
+    def extract_features(image):
+        inputs = preprocess_image(image)
+        with torch.no_grad():
+            outputs = convnext_model(**inputs)
+            features = outputs.logits
+        return features
 
-def generate_caption(image, max_length=50, num_beams=5):
-    image = Image.open(image).convert("RGB")
-    blip_inputs = blip_processor(images=image, return_tensors="pt").to(device)
-    with torch.no_grad():
-        caption_ids = blip_model.generate(
-            **blip_inputs, 
-            max_new_tokens=max_length,
-            num_beams=num_beams,
-            early_stopping=True
-        )
-        caption = blip_processor.batch_decode(caption_ids, skip_special_tokens=True)[0]
-    return caption
+    def generate_caption(image, max_length=50, num_beams=5):
+        image = Image.open(image).convert("RGB")
+        blip_inputs = blip_processor(images=image, return_tensors="pt").to(device)
+        with torch.no_grad():
+            caption_ids = blip_model.generate(
+                **blip_inputs, 
+                max_new_tokens=max_length,
+                num_beams=num_beams,
+                early_stopping=True
+            )
+            caption = blip_processor.batch_decode(caption_ids, skip_special_tokens=True)[0]
+        return caption
 
-# Generate caption button
-if uploaded_image is not None:
-    st.image(uploaded_image, caption="Uploaded Image", use_column_width=True)
-    st.write("Click below to generate a caption for your image.")
+    # Generate caption button
+    if uploaded_image is not None:
+        st.image(uploaded_image, caption="Uploaded Image", use_column_width=True)
+        st.write("Click below to generate a caption for your image.")
 
-    if st.button("ENTER", key="generate_button", help="Generate a caption for the uploaded image"):
-        try:
-            with st.spinner("Extracting features..."):
-                features = extract_features(uploaded_image)
+        if st.button("ENTER", key="generate_button", help="Generate a caption for the uploaded image"):
+            try:
+                with st.spinner("Extracting features..."):
+                    features = extract_features(uploaded_image)
+                
+                with st.spinner("Generating caption..."):
+                    caption = generate_caption(uploaded_image)
+                    
+                    # Convert the caption to uppercase
+                    formatted_caption = caption.upper()
+                    
+                    # Display the caption in light blue
+                    st.markdown(f"<h2>{formatted_caption}</h2>", unsafe_allow_html=True)
             
-            with st.spinner("Generating caption..."):
-                caption = generate_caption(uploaded_image)
-                
-                # Convert the caption to uppercase
-                formatted_caption = caption.upper()
-                
-                # Display the caption in light blue
-                st.markdown(f"<h2>{formatted_caption}</h2>", unsafe_allow_html=True)
-        
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
