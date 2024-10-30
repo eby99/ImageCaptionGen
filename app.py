@@ -46,7 +46,7 @@ st.markdown("""
         h2 {
             font-weight: bold;
             font-size: 32px;
-            color: lightblue; /* Caption color */
+            color: #0033cc; /* Dark blue for caption */
             text-align: center; /* Center align caption */
         }
         .button {
@@ -110,19 +110,19 @@ with st.container():
         st.image(uploaded_image, caption="Uploaded Image", use_column_width=True)
         st.write("Click below to generate a caption for your image.")
 
-        if st.button("ENTER", key="generate_button", help="Generate a caption for the uploaded image"):
+        if st.button("GENERATE CAPTION", key="generate_button", help="Generate a caption for the uploaded image"):
             try:
-                with st.spinner("Extracting features...",text_color='black'):
+                with st.spinner("Extracting features...", text_color='black'):  # Spinner message in black
                     features = extract_features(uploaded_image)
                 
-                with st.spinner("Generating caption...",text_color='black'):
+                with st.spinner("Generating caption...", text_color='black'):  # Spinner message in black
                     caption = generate_caption(uploaded_image)
                     
                     # Convert the caption to uppercase
                     formatted_caption = caption.upper()
                     
-                    # Display the caption in light blue
-                    st.markdown(f"<h2 style='font-weight:bold; font-size:32px; color:blue;'>{formatted_caption}</h2>", unsafe_allow_html=True)
+                    # Display the caption in darker blue
+                    st.markdown(f"<h2 style='font-weight:bold; font-size:32px; color:#0033cc;'>{formatted_caption}</h2>", unsafe_allow_html=True)
             
             except Exception as e:
                 st.error(f"An error occurred: {e}")
