@@ -46,7 +46,7 @@ st.markdown("""
         h2 {
             font-weight: bold;
             font-size: 32px;
-            color: #0033cc; /* Darker blue for caption */
+            color: lightblue; /* Caption color */
             text-align: center; /* Center align caption */
         }
         .button {
@@ -66,9 +66,6 @@ st.markdown("""
         }
         .file-uploader {
             margin: 20px 0; /* Add margin to file uploader */
-        }
-        .spinner {
-            color: black; /* Spinner message color */
         }
     </style>
 """, unsafe_allow_html=True)
@@ -113,19 +110,18 @@ with st.container():
         st.image(uploaded_image, caption="Uploaded Image", use_column_width=True)
         st.write("Click below to generate a caption for your image.")
 
-        # Updated button text and centering
-        if st.button("GENERATE CAPTION", key="generate_button", help="Generate a caption for the uploaded image"):
+        if st.button("ENTER", key="generate_button", help="Generate a caption for the uploaded image"):
             try:
-                with st.spinner("Extracting features...", text_color='black'):  # Spinner message in black
+                with st.spinner("Extracting features..."):
                     features = extract_features(uploaded_image)
                 
-                with st.spinner("Generating caption...", text_color='black'):  # Spinner message in black
+                with st.spinner("Generating caption..."):
                     caption = generate_caption(uploaded_image)
                     
                     # Convert the caption to uppercase
                     formatted_caption = caption.upper()
                     
-                    # Display the caption in a darker blue
+                    # Display the caption in light blue
                     st.markdown(f"<h2>{formatted_caption}</h2>", unsafe_allow_html=True)
             
             except Exception as e:
