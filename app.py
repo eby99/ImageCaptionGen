@@ -30,8 +30,10 @@ st.markdown("""
             border-radius: 10px;
             box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
         }
+        h1, h2, h3, h4, p {
+            color: black;  /* Change all text to black */
+        }
         h1 {
-            color: #f63366;
             font-weight: 700;
         }
         .button {
@@ -97,8 +99,8 @@ if uploaded_image is not None:
                 # Convert the caption to uppercase
                 formatted_caption = caption.upper()
                 
-                # Display the caption in bold with a larger font size and in a lighter color
-                st.markdown(f"<h2 style='font-weight:bold; font-size:32px; color:#00aaff;'>{formatted_caption}</h2>", unsafe_allow_html=True)
+                # Display the caption in bold with a larger font size and in black color
+                st.markdown(f"<h2 style='font-weight:bold; font-size:32px; color:black;'>{formatted_caption}</h2>", unsafe_allow_html=True)
         
         except Exception as e:
             st.error(f"An error occurred: {e}")
