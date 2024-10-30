@@ -24,28 +24,44 @@ st.set_page_config(page_title="Image Caption Generator", page_icon=":camera:", l
 # Style for the app
 st.markdown("""
     <style>
-        .main {
-            background-color: #f0f2f6;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        body {
+            background-color: #f0f2f6; /* Light gray background */
         }
-        h1, h2, h3, h4, p {
-            color: black;  /* Change all text to black */
+        .main {
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+            background-color: white; /* White card background */
+            max-width: 800px; /* Limit width */
+            margin: auto; /* Center the card */
         }
         h1 {
+            color: red; /* Title color */
             font-weight: 700;
+            font-size: 36px; /* Increase font size */
+            text-align: center; /* Center align title */
+        }
+        h2 {
+            font-weight: bold;
+            font-size: 32px;
+            color: lightblue; /* Caption color */
+            text-align: center; /* Center align caption */
         }
         .button {
             font-size: 18px;
-            background-color: #f63366;
-            color: white;
-            padding: 10px 20px;
+            background-color: #f63366; /* Button background color */
+            color: white; /* Button text color */
+            padding: 12px 24px; /* Padding for the button */
             border: none;
             border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease; /* Smooth transition */
         }
         .button:hover {
-            background-color: #e0245e;
+            background-color: #e0245e; /* Button hover color */
+        }
+        .file-uploader {
+            margin: 20px 0; /* Add margin to file uploader */
         }
     </style>
 """, unsafe_allow_html=True)
@@ -55,7 +71,7 @@ st.title("Image Caption Generator")
 st.write("")
 
 # Image upload
-uploaded_image = st.file_uploader("Choose an image file (JPG, JPEG, PNG)", type=["jpg", "jpeg", "png"])
+uploaded_image = st.file_uploader("Choose an image file (JPG, JPEG, PNG)", type=["jpg", "jpeg", "png"], label_visibility="collapsed")
 
 # Define functions for preprocessing, feature extraction, and caption generation
 def preprocess_image(image):
@@ -88,7 +104,7 @@ if uploaded_image is not None:
     st.image(uploaded_image, caption="Uploaded Image", use_column_width=True)
     st.write("Click below to generate a caption for your image.")
 
-    if st.button("ENTER", key="generate_button"):
+    if st.button("ENTER", key="generate_button", help="Generate a caption for the uploaded image"):
         try:
             with st.spinner("Extracting features..."):
                 features = extract_features(uploaded_image)
@@ -99,8 +115,8 @@ if uploaded_image is not None:
                 # Convert the caption to uppercase
                 formatted_caption = caption.upper()
                 
-                # Display the caption in bold with a larger font size and in black color
-                st.markdown(f"<h2 style='font-weight:bold; font-size:32px; color:black;'>{formatted_caption}</h2>", unsafe_allow_html=True)
+                # Display the caption in light blue
+                st.markdown(f"<h2>{formatted_caption}</h2>", unsafe_allow_html=True)
         
         except Exception as e:
             st.error(f"An error occurred: {e}")
