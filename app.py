@@ -112,10 +112,10 @@ with st.container():
 
         if st.button("GENERATE CAPTION", key="generate_button", help="Generate a caption for the uploaded image"):
             try:
-                with st.spinner("Extracting features...", text_color='black'):  # Spinner message in black
+                with st.spinner("Extracting features..."):  # No text_color argument
                     features = extract_features(uploaded_image)
                 
-                with st.spinner("Generating caption...", text_color='black'):  # Spinner message in black
+                with st.spinner("Generating caption..."):  # No text_color argument
                     caption = generate_caption(uploaded_image)
                     
                     # Convert the caption to uppercase
