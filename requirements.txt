@@ -1,6 +1,6 @@
 streamlit==1.20.0
 torch>=2.0.0  # Replace with the latest stable version
-
+streamlit>=1.18.0  # or the latest version available
 transformers
 Pillow
 numpy==1.24.4  # or another compatible version
