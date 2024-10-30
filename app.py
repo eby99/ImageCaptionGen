@@ -106,35 +106,23 @@ with st.container():
         return caption
 
     # Generate caption button
-    # Generate caption button
-if uploaded_image is not None:
-    st.image(uploaded_image, caption="Uploaded Image", use_column_width=True)
-    st.write("Click below to generate a caption for your image.")
+    if uploaded_image is not None:
+        st.image(uploaded_image, caption="Uploaded Image", use_column_width=True)
+        st.write("Click below to generate a caption for your image.")
 
-    # Center-aligned button
-    button_html = """
-    <div style="display: flex; justify-content: center;">
-        <button class="button" onclick="document.getElementById('generate_button').click();">GENERATE CAPTION</button>
-        <input type="submit" id="generate_button" style="display: none;">
-    </div>
-    """
-    st.markdown(button_html, unsafe_allow_html=True)
-
-    # Handle the button click
-    if st.button("GENERATE CAPTION", key="generate_button", help="Generate a caption for the uploaded image"):
-        try:
-            with st.spinner("Extracting features..."):
-                features = extract_features(uploaded_image)
+        if st.button("GENERATE CAPTION", key="generate_button", help="Generate a caption for the uploaded image"):
+            try:
+                with st.spinner("Extracting features...", text_color='black'):  # Spinner message in black
+                    features = extract_features(uploaded_image)
+                
+                with st.spinner("Generating caption...", text_color='black'):  # Spinner message in black
+                    caption = generate_caption(uploaded_image)
+                    
+                    # Convert the caption to uppercase
+                    formatted_caption = caption.upper()
+                    
+                    # Display the caption in darker blue
+                    st.markdown(f"<h2 style='font-weight:bold; font-size:32px; color:#0033cc;'>{formatted_caption}</h2>", unsafe_allow_html=True)
             
-            with st.spinner("Generating caption..."):
-                caption = generate_caption(uploaded_image)
-                
-                # Convert the caption to uppercase
-                formatted_caption = caption.upper()
-                
-                # Display the caption in darker blue
-                st.markdown(f"<h2 style='font-weight:bold; font-size:32px; color:#0033cc;'>{formatted_caption}</h2>", unsafe_allow_html=True)
-        
-        except Exception as e:
-            st.error(f"An error occurred: {e}")
-
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
