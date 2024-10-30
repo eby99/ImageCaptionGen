@@ -112,17 +112,17 @@ with st.container():
 
         if st.button("ENTER", key="generate_button", help="Generate a caption for the uploaded image"):
             try:
-                with st.spinner("Extracting features..."):
+                with st.spinner("Extracting features...",text_color='black'):
                     features = extract_features(uploaded_image)
                 
-                with st.spinner("Generating caption..."):
+                with st.spinner("Generating caption...",text_color='black'):
                     caption = generate_caption(uploaded_image)
                     
                     # Convert the caption to uppercase
                     formatted_caption = caption.upper()
                     
                     # Display the caption in light blue
-                    st.markdown(f"<h2>{formatted_caption}</h2>", unsafe_allow_html=True)
+                    st.markdown(f"<h2 style='font-weight:bold; font-size:32px; color:blue;'>{formatted_caption}</h2>", unsafe_allow_html=True)
             
             except Exception as e:
                 st.error(f"An error occurred: {e}")
