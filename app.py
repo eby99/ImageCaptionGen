@@ -1,22 +1,34 @@
 import streamlit as st
-import torch
-from transformers import BlipProcessor, BlipForConditionalGeneration, ConvNextImageProcessor, ConvNextForImageClassification
+from flask import Flask, request, jsonify
 from PIL import Image
-import logging
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
+import torch
+from transformers import BlipProcessor, BlipForConditionalGeneration
 
 # Load the models and processors
-convnext_processor = ConvNextImageProcessor.from_pretrained("facebook/convnext-large-224")
-convnext_model = ConvNextForImageClassification.from_pretrained("facebook/convnext-large-224")
-blip_processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-large")
-blip_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-large")
+convnext_processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-large")
+convnext_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-large")
 
 # Move models to GPU if available
 device = "cuda" if torch.cuda.is_available() else "cpu"
 convnext_model.to(device)
-blip_model.to(device)
+
+# Create a Flask API
+app = Flask(__name__)
+
+# Define API endpoints
+@app.route('/caption', methods=['POST'])
+def generate_caption_api():
+    image = request.files['image']
+    caption = generate_caption(image)
+    return jsonify({'caption': caption})
+
+def generate_caption(image):
+    img = Image.open(image).convert("RGB")
+    inputs = convnext_processor(images=img, return_tensors="pt").to(device)
+    with torch.no_grad():
+        outputs = convnext_model.generate(**inputs)
+        caption = convnext_processor.batch_decode(outputs, skip_special_tokens=True)[0]
+    return caption
 
 # Streamlit interface setup
 st.set_page_config(page_title="Image Caption Generator", page_icon=":camera:", layout="centered")
@@ -85,24 +97,11 @@ with st.container():
         inputs = convnext_processor(images=img, return_tensors="pt").to(device)
         return inputs
 
-    def extract_features(image):
+    def generate_caption(image):
         inputs = preprocess_image(image)
         with torch.no_grad():
-            outputs = convnext_model(**inputs)
-            features = outputs.logits
-        return features
-
-    def generate_caption(image, max_length=50, num_beams=5):
-        image = Image.open(image).convert("RGB")
-        blip_inputs = blip_processor(images=image, return_tensors="pt").to(device)
-        with torch.no_grad():
-            caption_ids = blip_model.generate(
-                **blip_inputs, 
-                max_new_tokens=max_length,
-                num_beams=num_beams,
-                early_stopping=True
-            )
-            caption = blip_processor.batch_decode(caption_ids, skip_special_tokens=True)[0]
+            outputs = convnext_model.generate(**inputs)
+            caption = convnext_processor.batch_decode(outputs, skip_special_tokens=True)[0]
         return caption
 
     # Generate caption button
@@ -112,9 +111,6 @@ with st.container():
 
         if st.button("GENERATE CAPTION", key="generate_button", help="Generate a caption for the uploaded image"):
             try:
-                with st.spinner("Extracting features..."):  # No text_color argument
-                    features = extract_features(uploaded_image)
-                
                 with st.spinner("Generating caption..."):  # No text_color argument
                     caption = generate_caption(uploaded_image)
                     
@@ -126,3 +122,6 @@ with st.container():
             
             except Exception as e:
                 st.error(f"An error occurred: {e}")
+
+if __name__ == '__main__':
+    app.run(debug=True)
