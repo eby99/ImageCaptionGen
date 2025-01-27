@@ -1,8 +1,7 @@
 streamlit==1.20.0
-torch>=2.0.0  # Replace with the latest stable version
-streamlit>=1.18.0  # or the latest version available
-transformers>=4.0.0  # or the specific version you're using
-
+torch>=2.0.0
+transformers>=4.0.0
 Pillow
-numpy==1.24.4  # or another compatible version
-pandas==1.5.3  # or another compatible version
+numpy==1.24.4
+pandas==1.5.3
+flask
